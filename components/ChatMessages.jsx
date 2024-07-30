@@ -1,0 +1,30 @@
+import React from 'react';
+import { LuWand2 } from 'react-icons/lu';
+import Molecule3DViewer from '@/lib/Molecule3DViewer';
+
+const ChatMessages = ({ messages }) => {
+  return (
+    <div className="flex flex-col space-y-4 p-4 overflow-y-auto max-h-full w-full">
+      {messages.map((message, index) => (
+        <div key={index} className="flex flex-col items-start space-y-2 max-w-full">
+          <div className={`w-full ${message.isUser ? 'text-left text-sm font-semibold' : 'text-left'}`}>
+            <div className="flex items-start space-x-2 max-w-full">
+              {!message.isUser && (
+                <div className="flex items-center space-x-2">
+                  <LuWand2 className="w-4 h-4 text-gray-600" />
+                  <span className="font-semibold text-gray-600">Results</span>
+                </div>
+              )}
+            </div>
+            <p className={`mt-2 whitespace-pre-wrap ${message.isUser ? 'text-2xl font-bold' : 'text-sm text-gray-800'}`}>
+              {message.text}
+            </p>
+            {message.isMol && <Molecule3DViewer moleculeData={message.molContent} />}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default ChatMessages;

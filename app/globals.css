@@ -67,3 +67,35 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* globals.css */
+html, body, #__next, .container {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Ensure no scrollbars on these elements */
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden; /* Ensure the container itself can scroll */
+}
+
+/* globals.css */
+@keyframes loading {
+  0% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}
+
+.loading-animation {
+  animation: loading 1s infinite;
+}

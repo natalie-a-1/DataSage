@@ -102,7 +102,7 @@ const ChatScreen = () => {
         </div>
       )}
       <div className="fixed bottom-0 w-full max-w-5xl bg-white p-4">
-        <TextInput onSendMessage={handleSendMessage} />
+        <TextInput onSendMessage={handleSendMessage} isStreaming={isStreaming} />
       </div>
       <div className="absolute top-4 right-4 text-xl font-semibold">
         {currentNotebook ? currentNotebook.name : 'No Notebook Selected'}

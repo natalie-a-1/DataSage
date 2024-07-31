@@ -6,7 +6,7 @@ import { fetchOpenAIResponse } from '@/api/openai';
 import { AppContext } from '@/app/AppContext';
 
 const ChatScreen = () => {
-  const { selectedPrompt, setSelectedPrompt, notebooks, currentNotebookId, addMessageToNotebook } = useContext(AppContext);
+  const { selectedPrompt, setSelectedPrompt, notebooks, currentNotebookId, addMessageToNotebook, updateLastMessageInNotebook } = useContext(AppContext);
   const currentNotebook = notebooks.find(nb => nb.id === currentNotebookId);
 
   useEffect(() => {
@@ -20,6 +20,7 @@ const ChatScreen = () => {
     addMessageToNotebook(currentNotebookId, message);
     try {
       const fullText = await fetchOpenAIResponse([message]);
+      addMessageToNotebook(currentNotebookId, { text: '', isUser: false }); // Add placeholder for response
       simulateStreamingResponse(fullText);
     } catch (error) {
       console.error('Error:', error);
@@ -39,6 +40,7 @@ const ChatScreen = () => {
         if (text.trim()) {
           try {
             const fullText = await fetchOpenAIResponse([...currentNotebook.messages, message]);
+            addMessageToNotebook(currentNotebookId, { text: '', isUser: false }); // Add placeholder for response
             simulateStreamingResponse(fullText, molContent);
           } catch (error) {
             console.error('Error:', error);
@@ -51,6 +53,7 @@ const ChatScreen = () => {
     } else {
       try {
         const fullText = await fetchOpenAIResponse([...currentNotebook.messages, message]);
+        addMessageToNotebook(currentNotebookId, { text: '', isUser: false }); // Add placeholder for response
         simulateStreamingResponse(fullText);
       } catch (error) {
         console.error('Error:', error);
@@ -64,7 +67,7 @@ const ChatScreen = () => {
     const intervalId = setInterval(() => {
       if (charIndex < fullText.length) {
         currentText += fullText[charIndex];
-        addMessageToNotebook(currentNotebookId, { text: currentText, isUser: false });
+        updateLastMessageInNotebook(currentNotebookId, currentText);
         charIndex++;
       } else {
         clearInterval(intervalId);

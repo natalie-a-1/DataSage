@@ -6,8 +6,8 @@ const ChatMessages = ({ messages }) => {
   return (
     <div className="flex flex-col space-y-4 p-4 overflow-y-auto max-h-full w-full">
       {messages.map((message, index) => (
-        <div key={index} className="flex flex-col items-start space-y-2 max-w-full">
-          <div className={`w-full ${message.isUser ? 'text-left text-sm font-semibold' : 'text-left'}`}>
+        <div key={`${message.text}-${index}`} className="flex flex-col items-start space-y-2 max-w-full">
+          <div className={`w-full ${message.isUser ?? 'text-left text-sm font-semibold'}`}>
             <div className="flex items-start space-x-2 max-w-full">
               {!message.isUser && (
                 <div className="flex items-center space-x-2">

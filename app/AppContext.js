@@ -25,7 +25,25 @@ export const AppProvider = ({ children }) => {
   };
 
   const addMessageToNotebook = (id, message) => {
-    setNotebooks(notebooks.map(nb => nb.id === id ? { ...nb, messages: [...nb.messages, message] } : nb));
+    setNotebooks(prevNotebooks =>
+      prevNotebooks.map(nb => nb.id === id ? { ...nb, messages: [...nb.messages, message] } : nb)
+    );
+  };
+
+  const updateLastMessageInNotebook = (id, newText) => {
+    setNotebooks(prevNotebooks =>
+      prevNotebooks.map(nb => {
+        if (nb.id === id) {
+          const messages = [...nb.messages];
+          const lastMessageIndex = messages.length - 1;
+          if (lastMessageIndex >= 0 && !messages[lastMessageIndex].isUser) { // Only update the last non-user message
+            messages[lastMessageIndex] = { ...messages[lastMessageIndex], text: newText };
+          }
+          return { ...nb, messages };
+        }
+        return nb;
+      })
+    );
   };
 
   const toggleSidebar = () => {
@@ -36,7 +54,7 @@ export const AppProvider = ({ children }) => {
     <AppContext.Provider value={{
       activeMenu, setActiveMenu, handleSeePromptLibrary,
       selectedPrompt, setSelectedPrompt, notebooks, addNotebook, selectNotebook,
-      currentNotebookId, addMessageToNotebook, isSidebarExpanded, toggleSidebar
+      currentNotebookId, addMessageToNotebook, updateLastMessageInNotebook, isSidebarExpanded, toggleSidebar
     }}>
       {children}
     </AppContext.Provider>

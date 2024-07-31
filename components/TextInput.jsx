@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FaRegPaperPlane } from 'react-icons/fa';
 import { IoMdArrowDropdown } from 'react-icons/io';
 import { FiSearch } from 'react-icons/fi';
@@ -22,10 +22,24 @@ const TextInput = ({ onSendMessage, isMessageSent, isStreaming }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [inputText, setInputText] = useState('');
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [initial, setInitial] = useState(true); // State to track if it's the initial input screen
+  const dropdownRef = useRef(null);
   const maxLength = 2000;
 
-  const handleSourceSelect = (selectedSource) => {
-    setSelectedSource(selectedSource);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleSourceSelect = (source) => {
+    setSelectedSource(selectedSource === source ? '' : source);
     setShowDropdown(false);
   };
 
@@ -48,6 +62,7 @@ const TextInput = ({ onSendMessage, isMessageSent, isStreaming }) => {
       onSendMessage(inputText, uploadedFiles);
       setInputText('');
       setUploadedFiles([]);
+      setInitial(false); // Switch to the smaller input box after sending the first message
     }
   };
 
@@ -79,33 +94,7 @@ const TextInput = ({ onSendMessage, isMessageSent, isStreaming }) => {
           ))}
         </div>
       )}
-      {isMessageSent ? (
-        <div className="flex items-center border rounded-lg p-2 bg-gray-100">
-          <LuWand2 className="mr-2" />
-          <input
-            type="text"
-            placeholder="Ask AI a question or make a request..."
-            value={inputText}
-            onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
-            className="flex-1 bg-transparent outline-none text-sm"
-            disabled={isStreaming}
-          />
-          <button
-            className={`ml-2 rounded-lg px-3 py-2 ${isStreaming ? 'bg-gray-400 cursor-not-allowed' : 'bg-lime-300'}`}
-            onClick={() => {
-              if ((inputText.trim() || uploadedFiles.length > 0) && !isStreaming) {
-                onSendMessage(inputText, uploadedFiles);
-                setInputText('');
-                setUploadedFiles([]);
-              }
-            }}
-            disabled={isStreaming}
-          >
-            <FaRegPaperPlane />
-          </button>
-        </div>
-      ) : (
+      {initial ? (
         <div className="flex flex-col border rounded-lg p-4 bg-gray-100 relative h-28">
           <div className="flex items-center mb-1">
             <LuWand2 className="mr-2" />
@@ -136,7 +125,7 @@ const TextInput = ({ onSendMessage, isMessageSent, isStreaming }) => {
               <IoMdArrowDropdown className="ml-1" />
             </button>
             {showDropdown && (
-              <div className="absolute bottom-full mb-2 bg-white border border-gray-300 rounded-lg shadow-lg z-10 w-48">
+              <div ref={dropdownRef} className="absolute bottom-full mb-2 bg-white border border-gray-300 rounded-lg shadow-lg z-10 w-48">
                 <div className="p-2">
                   <div className="flex items-center p-2">
                     <FiSearch className="mr-2" />
@@ -183,6 +172,7 @@ const TextInput = ({ onSendMessage, isMessageSent, isStreaming }) => {
                   onSendMessage(inputText, uploadedFiles);
                   setInputText('');
                   setUploadedFiles([]);
+                  setInitial(false); // Switch to the smaller input box after sending the first message
                 }
               }}
               disabled={isStreaming}
@@ -190,6 +180,42 @@ const TextInput = ({ onSendMessage, isMessageSent, isStreaming }) => {
               <FaRegPaperPlane />
             </button>
           </div>
+        </div>
+      ) : (
+        <div className="flex items-center border rounded-lg p-2 bg-gray-100">
+          <LuWand2 className="mr-2" />
+          <input
+            type="text"
+            placeholder="Ask AI a question or make a request..."
+            value={inputText}
+            onChange={handleInputChange}
+            onKeyPress={handleKeyPress}
+            className="flex-1 bg-transparent outline-none text-sm"
+            disabled={isStreaming}
+          />
+          <label className="flex items-center bg-gray-200 rounded-lg px-3 py-2 cursor-pointer">
+            <RxUpload className="" />
+            <input
+              type="file"
+              multiple
+              className="hidden"
+              onChange={handleFileUpload}
+              disabled={isStreaming}
+            />
+          </label>
+          <button
+            className={`ml-2 rounded-lg px-3 py-2 ${isStreaming ? 'bg-gray-400 cursor-not-allowed' : 'bg-lime-300'}`}
+            onClick={() => {
+              if ((inputText.trim() || uploadedFiles.length > 0) && !isStreaming) {
+                onSendMessage(inputText, uploadedFiles);
+                setInputText('');
+                setUploadedFiles([]);
+              }
+            }}
+            disabled={isStreaming}
+          >
+            <FaRegPaperPlane />
+          </button>
         </div>
       )}
     </div>

@@ -6,12 +6,18 @@ import Sidebar from "../components/Sidebar";
 import { AppProvider } from "./AppContext";
 import { usePathname } from 'next/navigation';
 import { metadata } from './metadata'; // Ensure the import is correct
+import { useEffect } from 'react';
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({ children }) {
   const pathname = usePathname();
   const showSidebar = pathname !== '/login' && pathname !== '/sign-up';
+
+  useEffect(() => {
+    // Ensure dark mode class is never applied
+    document.documentElement.classList.remove('dark');
+  }, []);
 
   return (
     <html lang="en">
